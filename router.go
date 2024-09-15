@@ -32,7 +32,7 @@ func Router(path string, res Response) ([]byte, string) {
 		SaveRequest(res)
 	}
 
-	u, _ := url.Parse("https://tls.peet.ws" + path)
+	u, _ := url.Parse("https://127.0.0.1" + path)
 	m, _ := url.ParseQuery(u.RawQuery)
 
 	paths := getAllPaths()

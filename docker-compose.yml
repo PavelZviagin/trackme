@@ -1,6 +1,17 @@
 version: "2.2"
 
 services:
+  mongo:
+    image: mongo:latest   # Используем официальный образ MongoDB
+    container_name: mongo_container   # Имя контейнера
+    ports:
+      - "27017:27017"   # Пробрасываем порт 27017 для доступа к MongoDB
+    volumes:
+      - ./data/db:/data/db   # Монтируем локальную папку для хранения данных базы данных
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin   # Имя пользователя для административного доступа
+      MONGO_INITDB_ROOT_PASSWORD: password 
+  
   peet-tls:
     image: peet-tls
     build:

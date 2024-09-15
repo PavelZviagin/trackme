@@ -166,6 +166,6 @@ func (c *Config) MakeDefault() {
 	c.Collection = "requests"
 	c.DB = "TrackMe"
 	c.LogIPs = false
-	c.HTTPRedirect = "https://tls.peet.ws"
+	c.HTTPRedirect = "https://127.0.0.1"
 	c.CorsKey = "X-CORS"
 }
