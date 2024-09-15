@@ -5,7 +5,7 @@
   "cert_file": "certs/chain.pem",
   "key_file": "certs/key.pem",
   "host": "0.0.0.0",
-  "http_redirect": "http://127.0.0.1",
+  "http_redirect": "https://track.pablodev.ru",
   "mongo_url": "mongodb://admin11113:password11113@mongo:27017",
   "mongo_database": "TrackMe",
   "mongo_collection": "requests",
