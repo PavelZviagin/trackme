@@ -1,17 +1,19 @@
-version: "2.2"
+version: "3.7"
 
 services:
   mongo:
     image: mongo:latest   # Используем официальный образ MongoDB
     container_name: mongo_container   # Имя контейнера
-    ports:
-      - "27017:27017"   # Пробрасываем порт 27017 для доступа к MongoDB
     volumes:
       - ./data/db:/data/db   # Монтируем локальную папку для хранения данных базы данных
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin   # Имя пользователя для административного доступа
-      MONGO_INITDB_ROOT_PASSWORD: password 
-  
+      MONGO_INITDB_ROOT_USERNAME: admin11113   # Имя пользователя для административного доступа
+      MONGO_INITDB_ROOT_PASSWORD: password11113
+    networks:
+      - web
+    labels:
+      - "traefik.enable=false"  # MongoDB не будет проксироваться через Traefik
+
   peet-tls:
     image: peet-tls
     build:
@@ -21,6 +23,43 @@ services:
       - ${PWD}/certs/:/app/certs
       - ${PWD}/config.json:/app/config.json
       - ${PWD}/blockedIPs:/app/blockedIPs
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.peet-tls.rule=Host(`example.com`)"  # Замените на ваш домен
+      - "traefik.http.routers.peet-tls.entrypoints=websecure"
+      - "traefik.http.routers.peet-tls.tls.certresolver=myresolver"
+      - "traefik.http.services.peet-tls.loadbalancer.server.port=443"
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=true"  # Оставляем API для мониторинга, можно убрать для продакшена
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=youremail@example.com"  # Замените на ваш email
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=DEBUG"
     ports:
-      - "443:443"
       - "80:80"
+      - "443:443"
+      - "8080:8080"  # Порт для доступа к Traefik дашборду
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`monitor.example.com`)"  # Домен для доступа к дашборду
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+networks:
+  web:
+    external: true
