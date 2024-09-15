@@ -166,6 +166,8 @@ func HandleTLSConnection(conn net.Conn) bool {
 		ClientRandom:     parsedClientHello.ClientRandom,
 	}
 
+	log.Println("JA3: ", tlsDetails.JA3)
+
 	// Check if the first line is HTTP/2
 	if string(request) == HTTP2_PREAMBLE {
 		handleHTTP2(conn, tlsDetails)
