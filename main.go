@@ -24,7 +24,7 @@ var local = false
 var connectedToDB = false
 var TCPFingerprints sync.Map
 
-func init() {
+func loadMongo() {
 	// Loads the config and connects to database (if enabled)
 
 	err := LoadedConfig.LoadFromFile()
@@ -87,6 +87,7 @@ func timeoutHandleTLSConnection(conn net.Conn) bool {
 }
 
 func main() {
+	loadMongo()
 	log.Println("Starting server...")
 	log.Println("Listening on " + LoadedConfig.Host + ":" + LoadedConfig.TLSPort)
 
