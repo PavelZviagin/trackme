@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -34,6 +33,7 @@ func init() {
 	}
 
 	if len(LoadedConfig.MongoURL) == 0 { // Don't attempt to setup mongo if its not populated in the config
+		log.Println("No mongo URL provided")
 		return
 	}
 
@@ -47,7 +47,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(LoadedConfig.DB, LoadedConfig.Collection)
+	log.Println(LoadedConfig.DB, LoadedConfig.Collection)
 	collection = client.Database(LoadedConfig.DB).Collection(LoadedConfig.Collection)
 	connectedToDB = true
 
