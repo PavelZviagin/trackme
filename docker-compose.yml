@@ -11,8 +11,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     networks:
       - web
-    labels:
-      - "traefik.enable=false"  # MongoDB не будет проксироваться через Traefik
 
   peet-tls:
     image: peet-tls
@@ -25,39 +23,6 @@ services:
       - ${PWD}/blockedIPs:/app/blockedIPs
     networks:
       - web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.peet-tls.rule=Host(`track.pablodev.ru`)"  # Домен для вашего сервиса
-      - "traefik.http.routers.peet-tls.entrypoints=websecure"
-      - "traefik.http.routers.peet-tls.tls.certresolver=myresolver"
-      - "traefik.http.services.peet-tls.loadbalancer.server.port=443"
-
-  traefik:
-    image: traefik:v2.10
-    container_name: traefik
-    command:
-      - "--api.insecure=false"  # Отключаем небезопасный режим для API
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=zviagin.pavel@gmail.com"  # Замените на реальный email
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"  # Порт для доступа к Traefik дашборду (через отдельный домен)
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`monitor.pablodev.ru`)"  # Домен для Traefik дашборда
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"  # Дашборд будет доступен по HTTPS
 
 networks:
   web:
